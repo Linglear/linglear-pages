@@ -1,79 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Linglear Login Redirect</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #0d1117;
-      color: #c9d1d9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
-    }
-    #status {
-      font-size: 1.2em;
-      margin-top: 20px;
-    }
-    .spinner {
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border-left-color: #09f;
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    body { font-family: Arial; text-align: center; padding: 20px; }
+    .status { margin-top: 20px; font-weight: bold; }
   </style>
 </head>
 <body>
-  <div>
-    <h1>🔐 Linglear Authentication</h1>
-    <div class="spinner"></div>
-    <p id="status">Processing login...</p>
-  </div>
+  <h2>Linglear Authentication</h2>
+  <div class="status" id="status">Processing login...</div>
 
   <script>
-    // Parse hash parameters from Cognito redirect
-    function getHashParams() {
-      const hash = window.location.hash.substring(1);
-      return hash.split('&').reduce((acc, item) => {
-        const [key, value] = item.split('=');
-        acc[key] = value && decodeURIComponent(value);
-        return acc;
-      }, {});
-    }
+    // Parse tokens from URL hash
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const idToken = hashParams.get('id_token');
+    const accessToken = hashParams.get('access_token');
 
-    const params = getHashParams();
-    const extensionId = "nnggnfmfndfnajfkjllffjailhgbbokn";
-
-    if (params.id_token) {
-      document.getElementById("status").innerText = "Login successful! Completing authentication...";
+    if (idToken) {
+      document.getElementById('status').textContent = 'Login successful! Closing...';
       
-      // Create hidden iframe to communicate with extension
-      const iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      
-      // Pass tokens to extension's callback page
-      iframe.src = `chrome-extension://${extensionId}/callback.html#id_token=${params.id_token}&access_token=${params.access_token || ''}&refresh_token=${params.refresh_token || ''}`;
+      // Send tokens to extension via iframe
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = `chrome-extension://${chrome.runtime.id}/callback.html#` +
+        `id_token=${encodeURIComponent(idToken)}&` +
+        `access_token=${encodeURIComponent(accessToken || '')}`;
       
       document.body.appendChild(iframe);
       
-      // Give time for message to be processed then close
-      setTimeout(() => {
-        window.close();
-      }, 1500);
+      // Close after short delay
+      setTimeout(() => window.close(), 1500);
     } else {
-      document.getElementById("status").innerText = "❌ Login failed. No token received.";
-      document.querySelector(".spinner").style.display = "none";
+      document.getElementById('status').textContent = 'Login failed - no tokens received';
     }
   </script>
 </body>
