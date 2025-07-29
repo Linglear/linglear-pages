@@ -17,54 +17,63 @@
     }
     #status {
       font-size: 1.2em;
+      margin-top: 20px;
+    }
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-left-color: #09f;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
   <div>
-    <h1>🔐 Logging you in to Linglear...</h1>
-    <p id="status">Waiting for Cognito response...</p>
+    <h1>🔐 Linglear Authentication</h1>
+    <div class="spinner"></div>
+    <p id="status">Processing login...</p>
   </div>
 
   <script>
-    function parseHashParams(hash) {
-      const params = {};
-      hash.substring(1).split("&").forEach(pair => {
-        const [key, value] = pair.split("=");
-        if (key && value) {
-          params[key] = decodeURIComponent(value);
-        }
-      });
-      return params;
+    // Parse hash parameters from Cognito redirect
+    function getHashParams() {
+      const hash = window.location.hash.substring(1);
+      return hash.split('&').reduce((acc, item) => {
+        const [key, value] = item.split('=');
+        acc[key] = value && decodeURIComponent(value);
+        return acc;
+      }, {});
     }
 
-    const params = parseHashParams(window.location.hash);
+    const params = getHashParams();
+    const extensionId = "nnggnfmfndfnajfkjllffjailhgbbokn";
 
     if (params.id_token) {
-      document.getElementById("status").innerText = "✅ Login successful. Completing authentication...";
+      document.getElementById("status").innerText = "Login successful! Completing authentication...";
       
       // Create hidden iframe to communicate with extension
       const iframe = document.createElement("iframe");
       iframe.style.display = "none";
       
-      // Encode tokens in the URL for the callback page
-      const tokenParams = new URLSearchParams();
-      tokenParams.append("id_token", params.id_token);
-      if (params.access_token) tokenParams.append("access_token", params.access_token);
-      if (params.refresh_token) tokenParams.append("refresh_token", params.refresh_token);
-      
-      // Use chrome-extension protocol with your actual extension ID
-      const extensionId = "agdbknoebcbbaegohkblhdcjcmlekdbe";
-      iframe.src = `chrome-extension://${extensionId}/callback.html?${tokenParams.toString()}`;
+      // Pass tokens to extension's callback page
+      iframe.src = `chrome-extension://${extensionId}/callback.html#id_token=${params.id_token}&access_token=${params.access_token || ''}&refresh_token=${params.refresh_token || ''}`;
       
       document.body.appendChild(iframe);
       
-      // Close the window after successful token transfer
+      // Give time for message to be processed then close
       setTimeout(() => {
         window.close();
-      }, 2000);
+      }, 1500);
     } else {
       document.getElementById("status").innerText = "❌ Login failed. No token received.";
+      document.querySelector(".spinner").style.display = "none";
     }
   </script>
 </body>
