@@ -2,34 +2,45 @@
 <html>
 <head>
   <style>
-    body { font-family: Arial; text-align: center; padding: 20px; }
-    .status { margin-top: 20px; font-weight: bold; }
+    body { 
+      font-family: Arial; 
+      text-align: center; 
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    #status {
+      margin-top: 20px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 5px;
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
   <h2>Linglear Authentication</h2>
-  <div class="status" id="status">Processing login...</div>
+  <div id="status">Processing login...</div>
 
   <script>
-    // Parse tokens from URL hash
+    // Extract tokens from URL hash
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const idToken = hashParams.get('id_token');
     const accessToken = hashParams.get('access_token');
 
     if (idToken) {
-      document.getElementById('status').textContent = 'Login successful! Closing...';
+      document.getElementById('status').textContent = 'Login successful! Completing authentication...';
       
-      // Send tokens to extension via iframe
+      // Create hidden iframe to communicate with extension
       const iframe = document.createElement('iframe');
       iframe.style.display = 'none';
-      iframe.src = `chrome-extension://${chrome.runtime.id}/callback.html#` +
+      iframe.src = `chrome-extension://nnggnfmfndfnajfkjllffjailhgbbokn/callback.html#` +
         `id_token=${encodeURIComponent(idToken)}&` +
         `access_token=${encodeURIComponent(accessToken || '')}`;
       
       document.body.appendChild(iframe);
       
-      // Close after short delay
-      setTimeout(() => window.close(), 1500);
+      // Close window after short delay
+      setTimeout(() => window.close(), 1000);
     } else {
       document.getElementById('status').textContent = 'Login failed - no tokens received';
     }
