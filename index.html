@@ -1,49 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <style>
-    body { 
-      font-family: Arial; 
-      text-align: center; 
-      padding: 20px;
-      background-color: #f5f5f5;
-    }
-    #status {
-      margin-top: 20px;
-      padding: 15px;
-      background: #fff;
-      border-radius: 5px;
-      display: inline-block;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linglear Extension – Home</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>Linglear Authentication</h2>
-  <div id="status">Processing login...</div>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="logo">Linglear</div>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="extension.html">Extension</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
 
-  <script>
-    // Extract tokens from URL hash
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const idToken = hashParams.get('id_token');
-    const accessToken = hashParams.get('access_token');
+  <!-- Hero section -->
+  <section class="hero" style="background-image: url('c822d7e9-630d-4076-affc-7e4c02ac9924.png');">
+    <h1>Revolutionize Your Learning</h1>
+    <p>Transform the way you consume information with our AI‑powered Chrome extension, secure authentication and seamless subscription management.</p>
+    <a class="btn" href="extension.html">Get the Extension</a>
+  </section>
 
-    if (idToken) {
-      document.getElementById('status').textContent = 'Login successful! Completing authentication...';
-      
-      // Create hidden iframe to communicate with extension
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = `chrome-extension://nnggnfmfndfnajfkjllffjailhgbbokn/callback.html#` +
-        `id_token=${encodeURIComponent(idToken)}&` +
-        `access_token=${encodeURIComponent(accessToken || '')}`;
-      
-      document.body.appendChild(iframe);
-      
-      // Close window after short delay
-      setTimeout(() => window.close(), 1000);
-    } else {
-      document.getElementById('status').textContent = 'Login failed - no tokens received';
-    }
-  </script>
+  <!-- Features section -->
+  <section class="section" id="features">
+    <h2 class="section-title">Why Linglear?</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>AI Powered</h3>
+        <p>Leverage advanced natural language processing to summarise long articles and generate quick insights directly in your browser.</p>
+      </div>
+      <div class="card">
+        <h3>Seamless Integration</h3>
+        <p>Connect your AWS Cognito account and manage your subscription through Stripe Checkout without leaving the extension.</p>
+      </div>
+      <div class="card">
+        <h3>Subscription Control</h3>
+        <p>Easily subscribe, upgrade or cancel your plan via Stripe’s hosted checkout and billing portal – all within a couple of clicks.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to action -->
+  <section class="section" style="text-align: center;">
+    <h2 class="section-title">Ready to elevate your productivity?</h2>
+    <p>Join hundreds of learners who are using Linglear to process information faster and focus on what matters.</p>
+    <a class="btn" href="extension.html">Install Now</a>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 Linglear. All rights reserved.</p>
+    <p>View the project on <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
 </body>
 </html>
